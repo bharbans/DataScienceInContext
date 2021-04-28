@@ -12,7 +12,8 @@ library(keras)  # for working with neural nets
 library(lime)    # for explaining models
 library(magick)  # for preprocessing images
 library(ggplot2)
-
+library(abind)
+library(tidyverse)
 ```
 
 ## What is Keras?
@@ -42,7 +43,7 @@ For this presentation I will be using the MNIST Dataset[@yann_lecun_corinna_cort
 
 
 <div class="centered">
-![Examples from Dataset](mnist_examples.png)
+![Examples from Dataset](https://raw.githubusercontent.com/bharbans/DataScienceInContext/main/mnist_examples.png)
 </div>
 
 
@@ -62,7 +63,7 @@ test_data_classification <- mnist_data$test$y
 ## Resize Images for Model
 The `train_data_images` and `test_data_image` data is a 3-d array (images,width,height) of grayscale values . To prepare the data for training we convert the 3-d arrays into matrices by reshaping width and height into a single dimension (28x28 images are flattened into length 784 vectors). Then, we convert the grayscale values from integers ranging between 0 to 255 into floating point values ranging between 0 and 1: [@allaire]
 
-```{r array-reshape-and-categorize-data}
+```{r array-reshape-and-categorize-data,echo=T }
 train_data_images <- array_reshape(train_data_images, c(nrow(train_data_images), 784))
 test_data_image <- array_reshape( test_data_image, c(nrow(test_data_image), 784) )
 
@@ -71,9 +72,9 @@ test_data_classification <- to_categorical(test_data_classification, 10)
 
 ```
 
-### Create Model
+## Create Model
 
-```{r create-model}
+```{r create-model, echo=T}
 model <- keras_model_sequential() 
 model %>% 
   layer_dense(units = 256, activation = 'relu', input_shape = c(784)) %>% 
@@ -84,8 +85,8 @@ model %>%
 ```
 [@allaire]
 
-### Compile Model
-```{r compile-model}
+## Compile Model
+```{r compile-model, echo=T}
 model %>% compile(
   loss = 'categorical_crossentropy',
   optimizer = optimizer_rmsprop(),
@@ -93,32 +94,33 @@ model %>% compile(
 )
 ```
 [@allaire]
-### Fit Model
-```{r fit-model, message=F}
+
+## Fit Model
+```{r fit-model, message=F, echo=T}
 history <- model %>% fit(
   train_data_images, train_data_classification, 
   epochs = 30, batch_size = 128, 
   validation_split = 0.2
 )
+```
+
+## Fit Model Plot
+```{r plot-history}
 plot(history)
 ```
 [@allaire]
 
-### Testing Model
+## Testing Model
 
-```{r test-model}
+```{r test-model, echo=T}
 model %>% evaluate(test_data_image, test_data_classification)
 ```
 [@allaire]
 
-### Show Predicted Classes
-```{r }
+## Show Predicted Classes
+```{r, echo=T}
 model %>% predict_classes(test_data_image)
 ```
 [@allaire]
-### Loading Additional Packages for Explaining Models, LIME.
-
-
-
 
 ## References
